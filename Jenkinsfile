@@ -5,7 +5,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t devops-flask-app .'
+                sh 'docker build -t devops-flask-app .'
             }
         }
 
