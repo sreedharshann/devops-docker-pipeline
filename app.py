@@ -1,57 +1,68 @@
 from flask import Flask
+from datetime import datetime
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return """
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    return f"""
     <html>
         <head>
-            <title>DevOps CI/CD Project</title>
+            <title>CI/CD Verification App</title>
+
             <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #0f172a;
+                body {{
+                    background: linear-gradient(to right, #1e3c72, #2a5298);
                     color: white;
+                    font-family: Arial, sans-serif;
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     height: 100vh;
                     margin: 0;
-                }
+                }}
 
-                .container {
-                    text-align: center;
-                    background: #1e293b;
+                .card {{
+                    background-color: rgba(0,0,0,0.3);
                     padding: 40px;
-                    border-radius: 15px;
-                    box-shadow: 0 0 20px rgba(0,0,0,0.4);
-                }
+                    border-radius: 20px;
+                    text-align: center;
+                    box-shadow: 0px 0px 20px rgba(0,0,0,0.4);
+                }}
 
-                h1 {
-                    color: #38bdf8;
-                }
+                h1 {{
+                    font-size: 40px;
+                    margin-bottom: 10px;
+                }}
 
-                p {
-                    font-size: 18px;
-                }
-
-                .status {
+                .success {{
+                    color: #00ff99;
+                    font-size: 24px;
                     margin-top: 20px;
-                    color: #22c55e;
-                    font-weight: bold;
-                }
+                }}
+
+                .time {{
+                    margin-top: 20px;
+                    font-size: 18px;
+                    color: #ffd166;
+                }}
             </style>
         </head>
 
         <body>
-            <div class="container">
-                <h1>🚀 DevOps CI/CD Pipeline</h1>
+            <div class="card">
+                <h1>🚀 CI/CD Pipeline Verified</h1>
 
-                <p>Flask Application Successfully Deployed</p>
+                <p>Your Jenkins + Docker deployment is working!</p>
 
-                <div class="status">
-                    ✅ Jenkins + Docker Pipeline Running
+                <div class="success">
+                    ✅ New Version Successfully Deployed
+                </div>
+
+                <div class="time">
+                    Deployment Time: {current_time}
                 </div>
             </div>
         </body>
