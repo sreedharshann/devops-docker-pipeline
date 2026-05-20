@@ -3,27 +3,10 @@ from datetime import datetime
 import socket
 import platform
 import psutil
-import subprocess
 
 app = Flask(__name__)
 
 start_time = datetime.now()
-
-
-def get_pod_count():
-    try:
-        output = subprocess.check_output(
-            "kubectl get pods --no-headers",
-            shell=True
-        ).decode()
-
-        pods = output.strip().split('\n')
-
-        return len([p for p in pods if p])
-
-    except:
-        return "N/A"
-
 
 @app.route('/')
 def dashboard():
@@ -38,8 +21,6 @@ def dashboard():
     uptime = datetime.now() - start_time
     uptime_str = str(uptime).split('.')[0]
 
-    pod_count = get_pod_count()
-
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     return f"""
@@ -48,7 +29,7 @@ def dashboard():
 
     <head>
 
-        <title>Real DevOps Monitoring Dashboard</title>
+        <title>Real DevOps Dashboard</title>
 
         <meta http-equiv="refresh" content="5">
 
@@ -123,7 +104,7 @@ def dashboard():
     <body>
 
         <div class="navbar">
-            🚀 Real Kubernetes Monitoring Dashboard
+            🚀 Real DevOps Monitoring Dashboard
         </div>
 
         <div class="container">
@@ -152,15 +133,8 @@ def dashboard():
                 </div>
 
                 <div class="card">
-                    <div class="title">Running Pods</div>
-                    <div class="value green">
-                        {pod_count}
-                    </div>
-                </div>
-
-                <div class="card">
                     <div class="title">Hostname</div>
-                    <div class="value" style="font-size:22px;">
+                    <div class="value" style="font-size:20px;">
                         {hostname}
                     </div>
                 </div>
@@ -181,8 +155,15 @@ def dashboard():
 
                 <div class="card">
                     <div class="title">Application Uptime</div>
-                    <div class="value" style="font-size:24px;">
+                    <div class="value" style="font-size:22px;">
                         {uptime_str}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="title">Pipeline Status</div>
+                    <div class="value green">
+                        ACTIVE
                     </div>
                 </div>
 
@@ -198,7 +179,6 @@ def dashboard():
 
     </html>
     """
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
