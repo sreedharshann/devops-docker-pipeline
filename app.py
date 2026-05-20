@@ -1,17 +1,46 @@
 from flask import Flask
-import random
 from datetime import datetime
+import socket
+import platform
+import psutil
+import subprocess
 
 app = Flask(__name__)
+
+start_time = datetime.now()
+
+
+def get_pod_count():
+    try:
+        output = subprocess.check_output(
+            "kubectl get pods --no-headers",
+            shell=True
+        ).decode()
+
+        pods = output.strip().split('\n')
+
+        return len([p for p in pods if p])
+
+    except:
+        return "N/A"
+
 
 @app.route('/')
 def dashboard():
 
-    cpu = random.randint(20, 95)
-    memory = random.randint(30, 90)
-    pods = random.randint(2, 5)
+    cpu = psutil.cpu_percent(interval=1)
+    memory = psutil.virtual_memory().percent
+    disk = psutil.disk_usage('/').percent
 
-    current_time = datetime.now().strftime("%H:%M:%S")
+    hostname = socket.gethostname()
+    system = platform.system()
+
+    uptime = datetime.now() - start_time
+    uptime_str = str(uptime).split('.')[0]
+
+    pod_count = get_pod_count()
+
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     return f"""
     <!DOCTYPE html>
@@ -19,25 +48,26 @@ def dashboard():
 
     <head>
 
-        <title>Kubernetes Monitoring Panel</title>
+        <title>Real DevOps Monitoring Dashboard</title>
+
+        <meta http-equiv="refresh" content="5">
 
         <style>
 
             body {{
                 margin: 0;
-                padding: 0;
-                background-color: #050816;
-                color: #00ffcc;
-                font-family: Consolas, monospace;
+                background: #0f172a;
+                font-family: Arial, sans-serif;
+                color: white;
             }}
 
-            .header {{
-                background-color: #0b1120;
+            .navbar {{
+                background: #020617;
                 padding: 20px;
                 text-align: center;
-                font-size: 36px;
+                font-size: 32px;
                 font-weight: bold;
-                border-bottom: 2px solid #00ffcc;
+                color: #38bdf8;
             }}
 
             .container {{
@@ -51,45 +81,39 @@ def dashboard():
             }}
 
             .card {{
-                background-color: #111827;
+                background: #1e293b;
                 padding: 30px;
-                border-radius: 15px;
-                box-shadow: 0px 0px 15px rgba(0,255,204,0.2);
-                transition: 0.3s;
-            }}
-
-            .card:hover {{
-                transform: scale(1.03);
-                box-shadow: 0px 0px 25px rgba(0,255,204,0.5);
+                border-radius: 18px;
+                box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
             }}
 
             .title {{
-                font-size: 18px;
-                margin-bottom: 15px;
                 color: #94a3b8;
+                margin-bottom: 15px;
+                font-size: 18px;
             }}
 
             .value {{
-                font-size: 40px;
+                font-size: 38px;
                 font-weight: bold;
             }}
 
-            .online {{
+            .green {{
                 color: #22c55e;
             }}
 
-            .warning {{
+            .yellow {{
                 color: #facc15;
             }}
 
-            .danger {{
+            .red {{
                 color: #ef4444;
             }}
 
             .footer {{
                 text-align: center;
-                margin-top: 50px;
-                color: #64748b;
+                margin-top: 40px;
+                color: #94a3b8;
             }}
 
         </style>
@@ -98,8 +122,8 @@ def dashboard():
 
     <body>
 
-        <div class="header">
-            ⚡ Kubernetes Cluster Monitoring Dashboard
+        <div class="navbar">
+            🚀 Real Kubernetes Monitoring Dashboard
         </div>
 
         <div class="container">
@@ -108,40 +132,64 @@ def dashboard():
 
                 <div class="card">
                     <div class="title">CPU Usage</div>
-                    <div class="value">{cpu}%</div>
+                    <div class="value {'red' if cpu > 80 else 'yellow' if cpu > 50 else 'green'}">
+                        {cpu}%
+                    </div>
                 </div>
 
                 <div class="card">
                     <div class="title">Memory Usage</div>
-                    <div class="value">{memory}%</div>
+                    <div class="value {'red' if memory > 80 else 'yellow' if memory > 50 else 'green'}">
+                        {memory}%
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="title">Disk Usage</div>
+                    <div class="value {'red' if disk > 80 else 'yellow' if disk > 50 else 'green'}">
+                        {disk}%
+                    </div>
                 </div>
 
                 <div class="card">
                     <div class="title">Running Pods</div>
-                    <div class="value">{pods}</div>
+                    <div class="value green">
+                        {pod_count}
+                    </div>
                 </div>
 
                 <div class="card">
-                    <div class="title">Cluster Status</div>
-                    <div class="value online">ONLINE</div>
+                    <div class="title">Hostname</div>
+                    <div class="value" style="font-size:22px;">
+                        {hostname}
+                    </div>
                 </div>
 
                 <div class="card">
-                    <div class="title">CI/CD Pipeline</div>
-                    <div class="value online">ACTIVE</div>
+                    <div class="title">Operating System</div>
+                    <div class="value" style="font-size:24px;">
+                        {system}
+                    </div>
                 </div>
 
                 <div class="card">
                     <div class="title">Deployment Time</div>
-                    <div class="value" style="font-size:28px;">
+                    <div class="value" style="font-size:22px;">
                         {current_time}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="title">Application Uptime</div>
+                    <div class="value" style="font-size:24px;">
+                        {uptime_str}
                     </div>
                 </div>
 
             </div>
 
             <div class="footer">
-                Powered by Flask • Docker • Jenkins • Kubernetes
+                Flask • Docker • Jenkins • Kubernetes • Minikube
             </div>
 
         </div>
@@ -150,6 +198,7 @@ def dashboard():
 
     </html>
     """
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
