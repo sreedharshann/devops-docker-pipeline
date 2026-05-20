@@ -1,152 +1,147 @@
 from flask import Flask
+import random
 from datetime import datetime
-import socket
-import platform
 
 app = Flask(__name__)
 
 @app.route('/')
-def home():
+def dashboard():
 
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    hostname = socket.gethostname()
-    system = platform.system()
+    cpu = random.randint(20, 95)
+    memory = random.randint(30, 90)
+    pods = random.randint(2, 5)
+
+    current_time = datetime.now().strftime("%H:%M:%S")
 
     return f"""
     <!DOCTYPE html>
     <html>
 
     <head>
-        <title>DevOps Kubernetes Dashboard</title>
+
+        <title>Kubernetes Monitoring Panel</title>
 
         <style>
 
-            * {{
+            body {{
                 margin: 0;
                 padding: 0;
-                box-sizing: border-box;
-                font-family: Arial, sans-serif;
+                background-color: #050816;
+                color: #00ffcc;
+                font-family: Consolas, monospace;
             }}
 
-            body {{
-                background: linear-gradient(135deg, #0f172a, #1e293b);
-                color: white;
-                height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+            .header {{
+                background-color: #0b1120;
+                padding: 20px;
+                text-align: center;
+                font-size: 36px;
+                font-weight: bold;
+                border-bottom: 2px solid #00ffcc;
             }}
 
             .container {{
-                width: 90%;
-                max-width: 900px;
-                background: rgba(255,255,255,0.05);
-                border-radius: 20px;
                 padding: 40px;
-                backdrop-filter: blur(10px);
-                box-shadow: 0 0 25px rgba(0,0,0,0.4);
-            }}
-
-            h1 {{
-                text-align: center;
-                color: #38bdf8;
-                margin-bottom: 10px;
-                font-size: 42px;
-            }}
-
-            .subtitle {{
-                text-align: center;
-                color: #cbd5e1;
-                margin-bottom: 40px;
             }}
 
             .grid {{
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 20px;
+                gap: 25px;
             }}
 
             .card {{
-                background: rgba(255,255,255,0.08);
-                padding: 25px;
+                background-color: #111827;
+                padding: 30px;
                 border-radius: 15px;
+                box-shadow: 0px 0px 15px rgba(0,255,204,0.2);
                 transition: 0.3s;
             }}
 
             .card:hover {{
-                transform: translateY(-5px);
-                background: rgba(255,255,255,0.12);
+                transform: scale(1.03);
+                box-shadow: 0px 0px 25px rgba(0,255,204,0.5);
             }}
 
-            .card h2 {{
-                color: #22c55e;
+            .title {{
+                font-size: 18px;
                 margin-bottom: 15px;
+                color: #94a3b8;
             }}
 
             .value {{
-                font-size: 20px;
+                font-size: 40px;
                 font-weight: bold;
-                color: #f8fafc;
             }}
 
-            .status {{
-                text-align: center;
-                margin-top: 40px;
-                font-size: 22px;
-                color: #4ade80;
-                font-weight: bold;
+            .online {{
+                color: #22c55e;
+            }}
+
+            .warning {{
+                color: #facc15;
+            }}
+
+            .danger {{
+                color: #ef4444;
             }}
 
             .footer {{
                 text-align: center;
-                margin-top: 25px;
-                color: #94a3b8;
-                font-size: 14px;
+                margin-top: 50px;
+                color: #64748b;
             }}
 
         </style>
+
     </head>
 
     <body>
 
+        <div class="header">
+            ⚡ Kubernetes Cluster Monitoring Dashboard
+        </div>
+
         <div class="container">
-
-            <h1>🚀 DevOps Dashboard</h1>
-
-            <div class="subtitle">
-                Jenkins + Docker + Kubernetes CI/CD Pipeline
-            </div>
 
             <div class="grid">
 
                 <div class="card">
-                    <h2>📦 Deployment Status</h2>
-                    <div class="value">Running Successfully</div>
+                    <div class="title">CPU Usage</div>
+                    <div class="value">{cpu}%</div>
                 </div>
 
                 <div class="card">
-                    <h2>⏰ Deployment Time</h2>
-                    <div class="value">{current_time}</div>
+                    <div class="title">Memory Usage</div>
+                    <div class="value">{memory}%</div>
                 </div>
 
                 <div class="card">
-                    <h2>🖥️ Hostname</h2>
-                    <div class="value">{hostname}</div>
+                    <div class="title">Running Pods</div>
+                    <div class="value">{pods}</div>
                 </div>
 
                 <div class="card">
-                    <h2>💻 Platform</h2>
-                    <div class="value">{system}</div>
+                    <div class="title">Cluster Status</div>
+                    <div class="value online">ONLINE</div>
                 </div>
 
-            </div>
+                <div class="card">
+                    <div class="title">CI/CD Pipeline</div>
+                    <div class="value online">ACTIVE</div>
+                </div>
 
-            <div class="status">
-                ✅ Kubernetes Cluster Operational
+                <div class="card">
+                    <div class="title">Deployment Time</div>
+                    <div class="value" style="font-size:28px;">
+                        {current_time}
+                    </div>
+                </div>
+
             </div>
 
             <div class="footer">
-                Built with Flask • Docker • Jenkins • Kubernetes
+                Powered by Flask • Docker • Jenkins • Kubernetes
             </div>
 
         </div>
