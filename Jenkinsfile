@@ -3,21 +3,15 @@ pipeline {
 
     stages {
 
-        stage('Build Docker Image') {
+        stage('Test') {
             steps {
-                sh 'docker build -t devops-flask-app .'
+                sh 'echo Jenkins Working Successfully!'
             }
         }
 
-        stage('Stop Old Container') {
+        stage('List Files') {
             steps {
-                sh 'docker rm -f flask-container || true'
-            }
-        }
-
-        stage('Run New Container') {
-            steps {
-                sh 'docker run -d -p 5000:5000 --name flask-container devops-flask-app'
+                sh 'ls'
             }
         }
 
