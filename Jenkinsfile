@@ -5,19 +5,19 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'sudo docker build -t devops-flask-app .'
+                sh 'docker build -t devops-flask-app .'
             }
         }
 
         stage('Stop Old Container') {
             steps {
-                sh 'sudo docker rm -f flask-container || true'
+                sh 'docker rm -f flask-container || true'
             }
         }
 
         stage('Run New Container') {
             steps {
-                sh 'sudo docker run -d -p 5000:5000 --name flask-container devops-flask-app'
+                sh 'docker run -d -p 5000:5000 --name flask-container devops-flask-app'
             }
         }
 
